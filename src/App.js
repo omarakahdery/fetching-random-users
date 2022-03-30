@@ -1,25 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import React, { useEffect, useState } from "react";
+import LokData from "./component/LokData";
 
-function App() {
+const fetchUsers = async () => {
+  const res = await fetch("https://randomuser.me/api/?results=10");
+  const data = await res.json();
+  const { results } = data;
+  return results;
+};
+const App = () => {
+  const [usersLocation, SetUsersLocation] = useState([]);
+  const location = (users) => {
+    users.forEach((user) => {
+      const { location, name } = user;
+      const nameAdd = { location, name };
+      SetUsersLocation((p) => [...p, nameAdd]);
+    });
+  };
+  useEffect(() => {
+    fetchUsers().then((results) => {
+      location(results);
+    });
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      {usersLocation.length === 0 ? (
+        <h1>Loading ...</h1>
+      ) : (
+        <LokData data={usersLocation} />
+      )}
+    </>
   );
-}
+};
 
 export default App;
+
+// {users.map((user, index) => (
+//   <div key={index}>{`${user.name.first} ${user.name.last}`}</div>
+// ))}
